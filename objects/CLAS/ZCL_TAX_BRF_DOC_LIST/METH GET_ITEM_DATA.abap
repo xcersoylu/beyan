@@ -83,7 +83,9 @@
               i_journalentryitem~financialaccounttype AS koart ,
               "
               wh~withholdingtaxtype AS witht,
-              wh~withholdingtaxcode AS wt_withcd
+              wh~withholdingtaxcode AS wt_withcd,
+              wh~whldgtaxamtincocodecrcy AS taxamount,
+              wh~whldgtaxbaseamtincocodecrcy AS baseamount
               FROM i_journalentryitem
               "
               INNER JOIN i_companycode
@@ -195,7 +197,9 @@
            i_journalentryitem~financialaccounttype AS koart,
            "
            wh~withholdingtaxtype AS witht,
-           wh~withholdingtaxcode AS wt_withcd
+           wh~withholdingtaxcode AS wt_withcd,
+           wh~whldgtaxamtincocodecrcy AS taxamount,
+           wh~whldgtaxbaseamtincocodecrcy AS baseamount
            "
            FROM i_journalentryitem
            INNER JOIN i_companycode

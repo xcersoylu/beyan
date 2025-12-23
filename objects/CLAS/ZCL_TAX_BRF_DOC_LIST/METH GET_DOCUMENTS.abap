@@ -72,9 +72,9 @@
                       ( sign   = 'I'
                         option = 'EQ'
                         low    = ls_mg_range-hkont ) ).
-
-    DELETE lt_data   WHERE racct NOT IN lr_hkont .
-    DELETE lt_data_k WHERE lifnr EQ space AND racct IN lr_hkont.
+*kaldırıldı Çağatay-Sümeyye
+*    DELETE lt_data   WHERE racct NOT IN lr_hkont .
+*    DELETE lt_data_k WHERE lifnr EQ space AND racct IN lr_hkont.
 
     SORT lt_data_191 BY rbukrs
                         gjahr
@@ -192,11 +192,13 @@
           ENDLOOP.
       ENDCASE.
       "ilk tutarlar
-      ls_collect-kst    = ls_data-hsl.
+***      ls_collect-kst    = ls_data-hsl. "kaldırıldı Çağatay - Sümeyye
 *      ls_collect-gyst   = ls_data-hsl +
 *                          lv_amount_k -
 *                          lv_amount_191.
-      ls_collect-gyst   = lv_amount_k.
+****      ls_collect-gyst   = lv_amount_k. "kaldırıldı Çağatay -Sümeyye
+      ls_collect-gyst = ls_data-taxamount + ls_data-baseamount. "Çağatay-Sümeyye
+      ls_collect-kst = ls_data-taxamount.
 
       "kiril1
       ls_collect-kiril1 = ls_mg-kiril1.

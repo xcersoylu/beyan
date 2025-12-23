@@ -77,6 +77,8 @@ CLASS zcl_tax_brf_doc_list DEFINITION
     TYPES koart       TYPE i_glaccountlineitemrawdata-financialaccounttype.
     TYPES witht       TYPE i_withholdingtaxitem-withholdingtaxtype.
     TYPES wt_withcd   TYPE i_withholdingtaxitem-withholdingtaxcode.
+    TYPES taxamount   TYPE i_withholdingtaxitem-whldgtaxamtincocodecrcy.
+    TYPES baseamount  TYPE i_withholdingtaxitem-whldgtaxbaseamtincocodecrcy.
     TYPES END OF mty_data.
 
     TYPES mtty_data    TYPE TABLE OF mty_data.
