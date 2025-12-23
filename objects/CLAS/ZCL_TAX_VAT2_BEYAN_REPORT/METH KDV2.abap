@@ -394,9 +394,10 @@
       CLEAR:  lv_conv_int ,lv_zta.
       LOOP AT lt_kschl_mwskz INTO DATA(ls_kschl_mwskz2) WHERE kiril1 = ls_k1k2-kiril1
                                                           AND kiril2 = ls_k1k2-kiril2.
-        lv_conv_int = lv_conv_int + abs( ls_kschl_mwskz2-kbetr ).
-        IF ls_kschl_mwskz2-kschl = 'ZTA'.
+        IF ls_kschl_mwskz2-kschl = 'ZTRA'.
           lv_zta = abs( ls_kschl_mwskz2-kbetr ).
+        ELSE.
+          lv_conv_int = abs( ls_kschl_mwskz2-kbetr ).
         ENDIF.
       ENDLOOP.
       lv_zta = lv_zta / 2.
