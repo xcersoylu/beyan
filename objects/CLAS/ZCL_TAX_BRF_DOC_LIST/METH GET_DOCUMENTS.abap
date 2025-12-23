@@ -1,9 +1,9 @@
   METHOD get_documents.
 
     TYPES BEGIN OF lty_lfa1.
-    TYPES lifnr TYPE i_supplier-Supplier.
-    TYPES name1 TYPE i_supplier-OrganizationBPName1.
-    TYPES name2 TYPE i_supplier-OrganizationBPName2.
+    TYPES lifnr TYPE i_supplier-supplier.
+    TYPES name1 TYPE i_supplier-organizationbpname1.
+    TYPES name2 TYPE i_supplier-organizationbpname2.
     TYPES END OF lty_lfa1.
 
     DATA ls_collect     TYPE mty_collect.
@@ -17,14 +17,14 @@
     DATA ls_data        TYPE mty_data.
     DATA ls_mg          TYPE mty_mg.
     DATA ls_detail      TYPE ztax_ddl_i_brf_detail.
-    DATA lv_amount_k    TYPE i_glaccountlineitemrawdata-AmountInCompanyCodeCurrency.
-    DATA lv_amount_191  TYPE i_glaccountlineitemrawdata-AmountInCompanyCodeCurrency.
-    DATA lv_butxt       TYPE i_companycode-CompanyCodeName."t001-butxt.
+    DATA lv_amount_k    TYPE i_glaccountlineitemrawdata-amountincompanycodecurrency.
+    DATA lv_amount_191  TYPE i_glaccountlineitemrawdata-amountincompanycodecurrency.
+    DATA lv_butxt       TYPE i_companycode-companycodename."t001-butxt.
     DATA lt_mmt         TYPE TABLE OF ztax_t_mmt.
     DATA ls_mmt         TYPE ztax_t_mmt.
     DATA ls_lfa1        TYPE lty_lfa1.
     DATA lt_lfa1        TYPE TABLE OF lty_lfa1.
-    DATA lr_hkont       TYPE RANGE OF i_operationalacctgdocitem-GLAccount."bseg-hkont.
+    DATA lr_hkont       TYPE RANGE OF i_operationalacctgdocitem-glaccount."bseg-hkont.
     FIELD-SYMBOLS <fs_collect>   TYPE mty_collect.
     FIELD-SYMBOLS <fs_data>      TYPE mty_data.
     FIELD-SYMBOLS <fs_data_191>  TYPE mty_data_191.
@@ -128,6 +128,29 @@
                                                hkont = ls_data-racct
                                                BINARY SEARCH.
         ELSE.
+*eklendi -Çağatay Sümeyye.
+          CASE ls_data-witht.
+            WHEN 'S1' OR 'S2' OR 'S3' OR 'S4'.
+              ls_lfb1-mindk = '22'.
+            WHEN 'S8'.
+              CASE ls_data-wt_withcd.
+                WHEN 'G9'.
+                  ls_lfb1-mindk = '22'.
+                WHEN 'G8'.
+                  ls_lfb1-mindk = '156'.
+              ENDCASE.
+            WHEN 'T3' OR 'S7' OR 'T4'.
+              ls_lfb1-mindk = '156'.
+            WHEN 'S5' OR 'S6'.
+              ls_lfb1-mindk = '41'.
+            WHEN 'S9'.
+              ls_lfb1-mindk = '279'.
+            WHEN 'T5' OR 'ST'.
+              ls_lfb1-mindk = '281'.
+            WHEN 'T2'.
+              ls_lfb1-mindk = '61'.
+          ENDCASE.
+****************
           READ TABLE lt_mg INTO ls_mg WITH KEY bukrs = ls_data-bukrs
                                                mindk = ls_lfb1-mindk.
         ENDIF.

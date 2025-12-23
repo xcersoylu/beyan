@@ -401,7 +401,7 @@
         ENDIF.
       ENDLOOP.
       lv_zta = lv_zta / 2.
-      ls_collect-tevkifato = |{ lv_zta }/ 10|.
+      ls_collect-tevkifato = |{ lv_zta }/10|.
       ls_collect-oran = lv_conv_int.
 *eklendi-son
       COLLECT ls_collect INTO mt_collect.
