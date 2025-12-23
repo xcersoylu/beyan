@@ -89,7 +89,7 @@
                ON wh~companycode EQ  itab~bukrs
                AND wh~accountingdocument EQ itab~belnr
                AND wh~fiscalyear EQ itab~gjahr
-               AND wh~accountingdocumentitem EQ itab~docln
+*               AND wh~accountingdocumentitem EQ itab~docln
      ORDER BY bukrs , belnr , gjahr , docln , witht
      INTO CORRESPONDING FIELDS OF TABLE @lt_data_wh.
 
