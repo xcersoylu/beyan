@@ -10,6 +10,7 @@
     DATA lt_mg          TYPE mtty_mg.
     DATA lt_mg_range    TYPE mtty_mg.
     DATA lt_data        TYPE mtty_data.
+    DATA lt_data_wh     TYPE mtty_data.
     DATA lt_data_k      TYPE mtty_data.
     DATA lt_data_191    TYPE mtty_data_191.
     DATA lt_lfb1        TYPE mtty_lfb1.
@@ -76,6 +77,22 @@
 *    DELETE lt_data   WHERE racct NOT IN lr_hkont .
 *    DELETE lt_data_k WHERE lifnr EQ space AND racct IN lr_hkont.
 
+    SELECT itab~bukrs AS bukrs,
+           itab~belnr AS belnr,
+           itab~gjahr AS gjahr,
+           itab~docln AS docln,
+           wh~withholdingtaxtype AS witht,
+           wh~withholdingtaxcode AS wt_withcd,
+           wh~whldgtaxamtincocodecrcy AS taxamount,
+           wh~whldgtaxbaseamtincocodecrcy AS baseamount
+    FROM @lt_data AS itab INNER JOIN i_withholdingtaxitem AS wh
+               ON wh~companycode EQ  itab~bukrs
+               AND wh~accountingdocument EQ itab~belnr
+               AND wh~fiscalyear EQ itab~gjahr
+               AND wh~accountingdocumentitem EQ itab~docln
+     ORDER BY bukrs , belnr , gjahr , docln , witht
+     INTO CORRESPONDING FIELDS OF TABLE @lt_data_wh.
+
     SORT lt_data_191 BY rbukrs
                         gjahr
                         belnr.
@@ -113,48 +130,48 @@
 ***                                               mindk = ls_lfb1-mindk
 ***                                               BINARY SEARCH.
 ***      ENDCASE.
-      READ TABLE lt_data_k ASSIGNING <fs_data> WITH KEY bukrs = ls_data-bukrs
-                                                        gjahr = ls_data-gjahr
-                                                        belnr = ls_data-belnr
-                                                        BINARY SEARCH.
-      IF sy-subrc EQ 0.
-        "önce satıcı kodu ile ara
-        READ TABLE lt_lfb1 INTO ls_lfb1 WITH KEY bukrs = ls_data-bukrs
-                                                 lifnr = <fs_data>-lifnr
-                                                 BINARY SEARCH.
-        "satıcıda yoksa, hesaptan genel azınlığa bak
-        IF sy-subrc NE 0.
-          READ TABLE lt_mg INTO ls_mg WITH KEY bukrs = ls_data-bukrs
-                                               hkont = ls_data-racct
-                                               BINARY SEARCH.
-        ELSE.
+*      READ TABLE lt_data_k ASSIGNING <fs_data> WITH KEY bukrs = ls_data-bukrs
+*                                                        gjahr = ls_data-gjahr
+*                                                        belnr = ls_data-belnr
+*                                                        BINARY SEARCH.
+*      IF sy-subrc EQ 0.
+      "önce satıcı kodu ile ara
+*        READ TABLE lt_lfb1 INTO ls_lfb1 WITH KEY bukrs = ls_data-bukrs
+*                                                 lifnr = <fs_data>-lifnr
+*                                                 BINARY SEARCH.
+*        "satıcıda yoksa, hesaptan genel azınlığa bak
+*        IF sy-subrc NE 0.
+*          READ TABLE lt_mg INTO ls_mg WITH KEY bukrs = ls_data-bukrs
+*                                               hkont = ls_data-racct
+*                                               BINARY SEARCH.
+*        ELSE.
 *eklendi -Çağatay Sümeyye.
-          CASE ls_data-witht.
-            WHEN 'S1' OR 'S2' OR 'S3' OR 'S4'.
+      CASE ls_data-witht.
+        WHEN 'S1' OR 'S2' OR 'S3' OR 'S4'.
+          ls_lfb1-mindk = '22'.
+        WHEN 'S8'.
+          CASE ls_data-wt_withcd.
+            WHEN 'G9'.
               ls_lfb1-mindk = '22'.
-            WHEN 'S8'.
-              CASE ls_data-wt_withcd.
-                WHEN 'G9'.
-                  ls_lfb1-mindk = '22'.
-                WHEN 'G8'.
-                  ls_lfb1-mindk = '156'.
-              ENDCASE.
-            WHEN 'T3' OR 'S7' OR 'T4'.
+            WHEN 'G8'.
               ls_lfb1-mindk = '156'.
-            WHEN 'S5' OR 'S6'.
-              ls_lfb1-mindk = '41'.
-            WHEN 'S9'.
-              ls_lfb1-mindk = '279'.
-            WHEN 'T5' OR 'ST'.
-              ls_lfb1-mindk = '281'.
-            WHEN 'T2'.
-              ls_lfb1-mindk = '61'.
           ENDCASE.
+        WHEN 'T3' OR 'S7' OR 'T4'.
+          ls_lfb1-mindk = '156'.
+        WHEN 'S5' OR 'S6'.
+          ls_lfb1-mindk = '41'.
+        WHEN 'S9'.
+          ls_lfb1-mindk = '279'.
+        WHEN 'T5' OR 'ST'.
+          ls_lfb1-mindk = '281'.
+        WHEN 'T2'.
+          ls_lfb1-mindk = '61'.
+      ENDCASE.
 ****************
-          READ TABLE lt_mg INTO ls_mg WITH KEY bukrs = ls_data-bukrs
-                                               mindk = ls_lfb1-mindk.
-        ENDIF.
-      ENDIF.
+      READ TABLE lt_mg INTO ls_mg WITH KEY bukrs = ls_data-bukrs
+                                           mindk = ls_lfb1-mindk.
+*        ENDIF.
+*      ENDIF.
 
       CHECK sy-subrc IS INITIAL.
 
@@ -197,8 +214,13 @@
 *                          lv_amount_k -
 *                          lv_amount_191.
 ****      ls_collect-gyst   = lv_amount_k. "kaldırıldı Çağatay -Sümeyye
-      ls_collect-gyst = ls_data-taxamount + ls_data-baseamount. "Çağatay-Sümeyye
-      ls_collect-kst = ls_data-taxamount.
+      READ TABLE lt_data_wh INTO DATA(ls_data_wh) WITH KEY bukrs = ls_data-bukrs
+                                                           belnr = ls_data-belnr
+                                                           gjahr = ls_data-gjahr
+                                                           docln = ls_data-docln
+                                                           witht = ls_data-witht BINARY SEARCH.
+      ls_collect-gyst = ls_data_wh-baseamount. "Çağatay-Sümeyye
+      ls_collect-kst = ls_data_wh-taxamount.
 
       "kiril1
       ls_collect-kiril1 = ls_mg-kiril1.
@@ -251,7 +273,7 @@
       CLEAR ls_lfb1.
       CLEAR ls_detail.
       CLEAR ls_collect.
-
+      CLEAR ls_data_wh.
     ENDLOOP.
 
     "abs
