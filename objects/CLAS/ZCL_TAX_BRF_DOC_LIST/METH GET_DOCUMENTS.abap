@@ -274,6 +274,12 @@
       CLEAR ls_detail.
       CLEAR ls_collect.
       CLEAR ls_data_wh.
+
+      delete lt_data_wh where bukrs = ls_data-bukrs
+                          and belnr = ls_data-belnr
+                          and gjahr = ls_data-gjahr
+                          and witht = ls_data-witht.
+
     ENDLOOP.
 
     "abs
