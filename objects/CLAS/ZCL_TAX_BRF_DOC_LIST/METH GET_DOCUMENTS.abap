@@ -80,7 +80,6 @@
     SELECT itab~bukrs AS bukrs,
            itab~belnr AS belnr,
            itab~gjahr AS gjahr,
-           itab~docln AS docln,
            wh~withholdingtaxtype AS witht,
            wh~withholdingtaxcode AS wt_withcd,
            wh~whldgtaxamtincocodecrcy AS taxamount,
@@ -90,8 +89,10 @@
                AND wh~accountingdocument EQ itab~belnr
                AND wh~fiscalyear EQ itab~gjahr
 *               AND wh~accountingdocumentitem EQ itab~docln
-     ORDER BY bukrs , belnr , gjahr , docln , witht
+     ORDER BY bukrs , belnr , gjahr , witht
      INTO CORRESPONDING FIELDS OF TABLE @lt_data_wh.
+    DELETE ADJACENT DUPLICATES FROM lt_data_wh COMPARING bukrs belnr gjahr witht.
+
 
     SORT lt_data_191 BY rbukrs
                         gjahr
@@ -217,7 +218,6 @@
       READ TABLE lt_data_wh INTO DATA(ls_data_wh) WITH KEY bukrs = ls_data-bukrs
                                                            belnr = ls_data-belnr
                                                            gjahr = ls_data-gjahr
-                                                           docln = ls_data-docln
                                                            witht = ls_data-witht BINARY SEARCH.
       ls_collect-gyst = ls_data_wh-baseamount. "Çağatay-Sümeyye
       ls_collect-kst = ls_data_wh-taxamount.
